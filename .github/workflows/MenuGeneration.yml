@@ -1,0 +1,32 @@
+name: Weekly Menu Generation
+
+on:
+  schedule:
+    - cron: '0 8 * * 5'  # Runs at 8 AM every Sunday
+  workflow_dispatch:      # Allows manual triggers
+
+jobs:
+  generate-menu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          pip install playwright python-dotenv schedule
+          playwright install chromium
+          
+      - name: Run menu generator
+        env:
+          CLAUDE_EMAIL: ${{ secrets.CLAUDE_EMAIL }}
+          CLAUDE_PASSWORD: ${{ secrets.CLAUDE_PASSWORD }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+        run: python MenuGeneration.py
